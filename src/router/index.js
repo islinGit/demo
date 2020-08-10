@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Second from '../components/Second.vue'
 import First from '../components/First'
 import Home from '../components/container/Home.vue'
+import OnePlay from '../components/study/OnePlay'
 
 Vue.use(VueRouter)
 
@@ -21,6 +22,11 @@ const routes = [
     path: '/First',
     name: 'First',
     component: First
+  },
+  {
+    path: '/OnePlay',
+    name: 'OnePlay',
+    component: OnePlay
   }
 ]
 
