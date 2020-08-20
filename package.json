@@ -38,5 +38,13 @@
     "less-loader": "^5.0.0",
     "sass-loader": "^9.0.3",
     "vue-template-compiler": "^2.6.11"
+  },
+  "rules": {
+    "generator-star-spacing": "off",
+    "no-tabs":"off",
+    "no-unused-vars":"off",
+    "no-console":"off",
+    "no-irregular-whitespace":"off",
+    "no-debugger": "off"
   }
 }
