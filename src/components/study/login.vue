@@ -6,65 +6,69 @@
         </ul>
         <!--表单-->
         <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm"  class="login-from" size="small ">
-          <el-form-item prop="pass" class="item-from">
+          <el-form-item prop="username" class="item-from">
             <label>用户名</label>
-            <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
+            <el-input type="text" v-model="ruleForm.username" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item  prop="checkPass" class="item-from">
+          <el-form-item  prop="password" class="item-from">
             <label>密码</label>
-            <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
+            <el-input type="text" v-model="ruleForm.password" autocomplete="off" minlength="6" maxlength="20"></el-input>
           </el-form-item>
-          <el-form-item  prop="age" class="item-from">
+          <el-form-item  prop="code" class="item-from">
             <label>验证码</label>
-            <el-input v-model.number="ruleForm.age"></el-input>
+            <el-row :gutter="10" >
+              <el-col :span="15">
+                <el-input v-model.number="ruleForm.code"></el-input>
+              </el-col>
+              <el-col :span="9" >
+                <el-button type="success" class="block">获取验证码</el-button>
+              </el-col>
+            </el-row>
           </el-form-item>
           <el-form-item>
-            <el-button type="danger" @click="submitForm('ruleForm')" class="block">提交</el-button>
+            <el-button type="danger" @click="submitForm('ruleForm')" class="login-tj block">提交</el-button>
           </el-form-item>
         </el-form>
       </div>
     </div>
 </template>
-
 <script>
+import { stripscript } from 'D:\\工程\\VueProject\\demo\\src\\utils\\validate.js'
 export default {
   // 数据驱动视图渲染
   name: 'login',
   data () {
-    // eslint-disable-next-line no-unused-vars
-    var checkAge = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('年龄不能为空'))
+    // 这里验证用户名密码
+    var validateUsername = (rule, value, callback) => {
+      var reg = /^([a-zA-Z]|[0-9])(\w|\\-)+@[a-zA-Z]|[0-9]+\.([a-zA-Z]{2,4})$/
+      if (value === '') {
+        callback(new Error('请输入用户名'))
+      } else if (!reg.test(value)) {
+        callback(new Error('用户名格式错误'))
+      } else {
+        callback() // ture
       }
-      setTimeout(() => {
-        if (!Number.isInteger(value)) {
-          callback(new Error('请输入数字值'))
-        } else {
-          if (value < 18) {
-            callback(new Error('必须年满18岁'))
-          } else {
-            callback()
-          }
-        }
-      }, 1000)
     }
-    // eslint-disable-next-line no-unused-vars
-    var validatePass = (rule, value, callback) => {
+    // 验证密码
+    var validatePassword = (rule, value, callback) => {
+      var reg = /^(?!\D+$)(?![^a-zA-Z]+$)\S{6,20}$/
       if (value === '') {
         callback(new Error('请输入密码'))
+      } else if (!reg.test(value)) {
+        callback(new Error('请输入正确的密码！'))
       } else {
-        if (this.ruleForm.checkPass !== '') {
-          this.$refs.ruleForm.validateField('checkPass')
-        }
         callback()
       }
     }
+    // 校验验证码
     // eslint-disable-next-line no-unused-vars
-    var validatePass2 = (rule, value, callback) => {
+    var validatecode = (rule, value, callback) => {
+      console.log(stripscript(value))
+      var reg = /^[a-z0-9]{6}$/
       if (value === '') {
-        callback(new Error('请再次输入密码'))
-      } else if (value !== this.ruleForm.pass) {
-        callback(new Error('两次输入密码不一致!'))
+        callback(new Error('请输入验证码'))
+      } else if (!reg.test(value)) {
+        callback(new Error('验证码错误'))
       } else {
         callback()
       }
@@ -75,19 +79,19 @@ export default {
         { text: '注册', isactive: false }
       ],
       ruleForm: {
-        pass: '',
-        checkPass: '',
-        age: ''
+        username: '',
+        password: '',
+        code: ''
       },
       rules: {
-        pass: [
-          { validator: validatePass, trigger: 'blur' }
+        username: [
+          { validator: validateUsername, trigger: 'blur' }
         ],
-        checkPass: [
-          { validator: validatePass2, trigger: 'blur' }
+        password: [
+          { validator: validatePassword, trigger: 'blur' }
         ],
-        age: [
-          { validator: checkAge, trigger: 'blur' }
+        code: [
+          { validator: validatecode, trigger: 'blur' }
         ]
       }
     }
@@ -97,6 +101,7 @@ export default {
 
   },
   methods: {
+    // Vue 数据驱动视图渲染
     toggleMenu (data) {
       this.menuTab.forEach(elem => {
         elem.isactive = false
@@ -113,6 +118,14 @@ export default {
           return false
         }
       })
+    },
+    stripscript2 (str) {
+      var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）&mdash;—|{}【】‘；：”“'。，、？]")
+      var rs = ''
+      for (var i = 0; i < str.length; i++) {
+        rs = rs + str.substr(i, 1).replace(pattern, '')
+      }
+      return rs
     }
   }
 }
@@ -156,6 +169,9 @@ export default {
     .block {
       display: block;
       width: 100%;
+    }
+    .login-tj {
+      margin-top: 19px;
     }
   }
 </style>

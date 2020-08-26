@@ -45,7 +45,6 @@ module.exports = {
     proxy: null // string | Object
     // before: app => {}
   }, // 第三方插件配置
-
   pluginOptions: {
     // ...
   }
