@@ -33,7 +33,7 @@
     </div>
 </template>
 <script>
-import { stripscript } from 'D:\\工程\\VueProject\\demo\\src\\utils\\validate.js'
+import { stripscript } from '../utils/validate'
 export default {
   // 数据驱动视图渲染
   name: 'login',
@@ -51,6 +51,7 @@ export default {
     }
     // 验证密码
     var validatePassword = (rule, value, callback) => {
+      console.log(stripscript(value))
       var reg = /^(?!\D+$)(?![^a-zA-Z]+$)\S{6,20}$/
       if (value === '') {
         callback(new Error('请输入密码'))
@@ -63,7 +64,6 @@ export default {
     // 校验验证码
     // eslint-disable-next-line no-unused-vars
     var validatecode = (rule, value, callback) => {
-      console.log(stripscript(value))
       var reg = /^[a-z0-9]{6}$/
       if (value === '') {
         callback(new Error('请输入验证码'))
