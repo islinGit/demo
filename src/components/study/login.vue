@@ -12,7 +12,11 @@
           </el-form-item>
           <el-form-item  prop="password" class="item-from">
             <label>密码</label>
-            <el-input type="text" v-model="ruleForm.password" autocomplete="off" minlength="6" maxlength="20"></el-input>
+            <el-input type="test" v-model="ruleForm.password" autocomplete="off" minlength="6" maxlength="20"></el-input>
+          </el-form-item>
+          <el-form-item  prop="passwords" class="item-from" v-if="loginmode ==='register'" >
+            <label>重复密码</label>
+            <el-input type="test" v-model="ruleForm.passwords" autocomplete="off" minlength="6" maxlength="20"></el-input>
           </el-form-item>
           <el-form-item  prop="code" class="item-from">
             <label>验证码</label>
@@ -33,17 +37,16 @@
     </div>
 </template>
 <script>
-import { stripscript } from '../utils/validate'
+import { stripscript, validateEmail, validatepw, validatcd } from '../utils/validate'
 export default {
   // 数据驱动视图渲染
   name: 'login',
   data () {
-    // 这里验证用户名密码
+    // 这里验证用户名
     var validateUsername = (rule, value, callback) => {
-      var reg = /^([a-zA-Z]|[0-9])(\w|\\-)+@[a-zA-Z]|[0-9]+\.([a-zA-Z]{2,4})$/
       if (value === '') {
         callback(new Error('请输入用户名'))
-      } else if (!reg.test(value)) {
+      } else if (validateEmail(value)) {
         callback(new Error('用户名格式错误'))
       } else {
         callback() // ture
@@ -51,23 +54,38 @@ export default {
     }
     // 验证密码
     var validatePassword = (rule, value, callback) => {
-      console.log(stripscript(value))
-      var reg = /^(?!\D+$)(?![^a-zA-Z]+$)\S{6,20}$/
+      // 过滤数据中包含得特殊字符
+      this.ruleForm.password = stripscript(value)
+      value = this.ruleForm.password
       if (value === '') {
         callback(new Error('请输入密码'))
-      } else if (!reg.test(value)) {
-        callback(new Error('请输入正确的密码！'))
+      } else if (validatepw(value)) {
+        callback(new Error('请输入六位数字+字母'))
       } else {
+        callback()
+      }
+    }
+    // 验证重置密码
+    var validatePasswords = (rule, value, callback) => {
+      // 过滤数据中包含得特殊字符
+      this.ruleForm.passwords = stripscript(value)
+      value = this.ruleForm.passwords
+      if (value === '') {
+        callback(new Error('请再次输入密码'))
+      } else if (validatepw(value)) {
+        callback(new Error('请输入六位数字+字母'))
+      }else if(value !== this.ruleForm.password) {
+        callback(new Error('输入的密码不相同'))
+      }else {
         callback()
       }
     }
     // 校验验证码
     // eslint-disable-next-line no-unused-vars
     var validatecode = (rule, value, callback) => {
-      var reg = /^[a-z0-9]{6}$/
       if (value === '') {
         callback(new Error('请输入验证码'))
-      } else if (!reg.test(value)) {
+      } else if (validatcd(value)) {
         callback(new Error('验证码错误'))
       } else {
         callback()
@@ -75,12 +93,16 @@ export default {
     }
     return {
       menuTab: [
-        { text: '登录', isactive: true },
-        { text: '注册', isactive: false }
+        { text: '登录', isactive: true, type: 'login' },
+        { text: '注册', isactive: false, type: 'register' }
       ],
+      // 注册显示
+      loginmode: '',
+      // 表单数据
       ruleForm: {
         username: '',
         password: '',
+        passwords: '',
         code: ''
       },
       rules: {
@@ -89,6 +111,9 @@ export default {
         ],
         password: [
           { validator: validatePassword, trigger: 'blur' }
+        ],
+        passwords: [
+          { validator: validatePasswords, trigger: 'blur' }
         ],
         code: [
           { validator: validatecode, trigger: 'blur' }
@@ -108,6 +133,8 @@ export default {
       })
       // 高光
       data.isactive = true
+      // 切换登录注册
+      this.loginmode = data.type
     },
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
@@ -118,14 +145,6 @@ export default {
           return false
         }
       })
-    },
-    stripscript2 (str) {
-      var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）&mdash;—|{}【】‘；：”“'。，、？]")
-      var rs = ''
-      for (var i = 0; i < str.length; i++) {
-        rs = rs + str.substr(i, 1).replace(pattern, '')
-      }
-      return rs
     }
   }
 }
