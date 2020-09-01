@@ -2,61 +2,67 @@
     <div id="login">
       <div class="login-wrap">
         <ul class="menu-tab">
-          <li :class="{'current': item.isactive}" v-for="item in menuTab" :key="item.id" @click="toggleMenu(item)">{{item.text}}</li>
+          <li :class="{'current': item.isactive}" :key="item.id" @click="toggleMenu(item)" v-for="item in menuTab">{{item.text}}</li>
         </ul>
         <!--表单-->
-        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm"  class="login-from" size="small ">
-          <el-form-item prop="username" class="item-from">
+        <el-form :model="ruleForm" :rules="rules" class="login-from" ref="ruleForm"  size="small " status-icon>
+          <el-form-item class="item-from" prop="username">
             <label>用户名</label>
-            <el-input type="text" v-model="ruleForm.username" autocomplete="off"></el-input>
+            <el-input autocomplete="off" type="text" v-model="ruleForm.username"></el-input>
           </el-form-item>
-          <el-form-item  prop="password" class="item-from">
+          <el-form-item  class="item-from" prop="password">
             <label>密码</label>
-            <el-input type="test" v-model="ruleForm.password" autocomplete="off" minlength="6" maxlength="20"></el-input>
+            <el-input autocomplete="off" maxlength="20" minlength="6" type="test" v-model="ruleForm.password"></el-input>
           </el-form-item>
-          <el-form-item  prop="passwords" class="item-from" v-if="loginmode ==='register'" >
+          <el-form-item  class="item-from" prop="passwords" v-if="modle === 'register'" >
             <label>重复密码</label>
-            <el-input type="test" v-model="ruleForm.passwords" autocomplete="off" minlength="6" maxlength="20"></el-input>
+            <el-input autocomplete="off" maxlength="20" minlength="6" type="test" v-model="ruleForm.passwords"></el-input>
           </el-form-item>
-          <el-form-item  prop="code" class="item-from">
+          <el-form-item  class="item-from" prop="code">
             <label>验证码</label>
             <el-row :gutter="10" >
               <el-col :span="15">
                 <el-input v-model.number="ruleForm.code"></el-input>
               </el-col>
               <el-col :span="9" >
-                <el-button type="success" class="block">获取验证码</el-button>
+                <el-button class="block" type="success">获取验证码</el-button>
               </el-col>
             </el-row>
           </el-form-item>
           <el-form-item>
-            <el-button type="danger" @click="submitForm('ruleForm')" class="login-tj block">提交</el-button>
+            <el-button @click="submitForm('ruleForm')" class="login-tj block" type="danger">提交</el-button>
           </el-form-item>
         </el-form>
       </div>
     </div>
 </template>
 <script>
+import { reactive, ref,isRef, onMounted } from '@vue/composition-api'
+import axios from 'axios'
 import { stripscript, validateEmail, validatepw, validatcd } from '../utils/validate'
 export default {
   // 数据驱动视图渲染
   name: 'login',
-  data () {
-    // 这里验证用户名
+  setup (props,context) {
+    /**
+     * 声明对象、变量
+     * @type {UnwrapRef<({isactive: boolean, text: string, type: string}|{isactive: boolean, text: string, type: string})[]>}
+     */
+      // 这里验证用户名
     var validateUsername = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入用户名'))
-      } else if (validateEmail(value)) {
-        callback(new Error('用户名格式错误'))
-      } else {
-        callback() // ture
+        if (value === '') {
+          callback(new Error('请输入用户名'))
+        } else if (validateEmail(value)) {
+          callback(new Error('用户名格式错误'))
+        } else {
+          callback() // ture
+        }
       }
-    }
     // 验证密码
     var validatePassword = (rule, value, callback) => {
       // 过滤数据中包含得特殊字符
-      this.ruleForm.password = stripscript(value)
-      value = this.ruleForm.password
+      ruleForm.password = stripscript(value)
+      value = ruleForm.password
       if (value === '') {
         callback(new Error('请输入密码'))
       } else if (validatepw(value)) {
@@ -68,13 +74,13 @@ export default {
     // 验证重置密码
     var validatePasswords = (rule, value, callback) => {
       // 过滤数据中包含得特殊字符
-      this.ruleForm.passwords = stripscript(value)
-      value = this.ruleForm.passwords
+      ruleForm.passwords = stripscript(value)
+      value = ruleForm.passwords
       if (value === '') {
         callback(new Error('请再次输入密码'))
       } else if (validatepw(value)) {
         callback(new Error('请输入六位数字+字母'))
-      }else if(value !== this.ruleForm.password) {
+      }else if(value !== ruleForm.password) {
         callback(new Error('输入的密码不相同'))
       }else {
         callback()
@@ -91,53 +97,60 @@ export default {
         callback()
       }
     }
-    return {
-      menuTab: [
+    // 登录 注册
+    const menuTab = reactive ([
         { text: '登录', isactive: true, type: 'login' },
         { text: '注册', isactive: false, type: 'register' }
+      ])
+    // 注册显示
+    const modle = ref('login')
+    // 表单绑定数据
+    const ruleForm = reactive( {
+      username: '',
+      password: '',
+      passwords: '',
+      code: ''
+    })
+    // 表单得验证
+    const rules = reactive( {
+      username: [
+        { validator: validateUsername, trigger: 'blur' }
       ],
-      // 注册显示
-      loginmode: '',
-      // 表单数据
-      ruleForm: {
-        username: '',
-        password: '',
-        passwords: '',
-        code: ''
-      },
-      rules: {
-        username: [
-          { validator: validateUsername, trigger: 'blur' }
-        ],
         password: [
-          { validator: validatePassword, trigger: 'blur' }
-        ],
+        { validator: validatePassword, trigger: 'blur' }
+      ],
         passwords: [
-          { validator: validatePasswords, trigger: 'blur' }
-        ],
+        { validator: validatePasswords, trigger: 'blur' }
+      ],
         code: [
-          { validator: validatecode, trigger: 'blur' }
-        ]
-      }
-    }
-  },
-  // 挂载完成后自动执行
-  mounted () {
+        { validator: validatecode, trigger: 'blur' }
+      ]
+    })
 
-  },
-  methods: {
-    // Vue 数据驱动视图渲染
-    toggleMenu (data) {
-      this.menuTab.forEach(elem => {
+    /**
+     * 声明函数
+     */
+    // 页面视图动态渲染
+    const toggleMenu = (data => {
+      menuTab.forEach(elem => {
         elem.isactive = false
       })
       // 高光
       data.isactive = true
       // 切换登录注册
-      this.loginmode = data.type
-    },
-    submitForm (formName) {
-      this.$refs[formName].validate((valid) => {
+      modle.value = data.type
+    })
+    // 提交
+    const submitForm = (formName => {
+      // 为给定 ID 的 user 创建请求
+      axios.get('/user?ID=12345')
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        })
+      context.refs[formName].validate((valid) => {
         if (valid) {
           alert('submit!')
         } else {
@@ -145,6 +158,26 @@ export default {
           return false
         }
       })
+    })
+
+    /**
+     * 声明生命周期
+     */
+    // 挂载完成后自动执行
+    onMounted(() => {
+      // console.log('mounted!')
+    })
+
+    /**
+     * 返回数据
+     */
+    return {
+      menuTab,
+      modle,
+      ruleForm,
+      rules,
+      toggleMenu,
+      submitForm,
     }
   }
 }
