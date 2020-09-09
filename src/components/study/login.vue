@@ -25,7 +25,7 @@
                 <el-input v-model.number="ruleForm.code"></el-input>
               </el-col>
               <el-col :span="9" >
-                <el-button class="block" type="success">获取验证码</el-button>
+                <el-button class="block" type="success" @click="getcode()">获取验证码</el-button>
               </el-col>
             </el-row>
           </el-form-item>
@@ -37,27 +37,27 @@
     </div>
 </template>
 <script>
-import { reactive, ref,isRef, onMounted } from '@vue/composition-api'
-import axios from 'axios'
+import { reactive, ref, isRef, onMounted } from '@vue/composition-api'
+import { getSms } from '../api/login'
 import { stripscript, validateEmail, validatepw, validatcd } from '../utils/validate'
 export default {
   // 数据驱动视图渲染
   name: 'login',
-  setup (props,context) {
+  setup (props, context) {
     /**
      * 声明对象、变量
      * @type {UnwrapRef<({isactive: boolean, text: string, type: string}|{isactive: boolean, text: string, type: string})[]>}
      */
-      // 这里验证用户名
+    // 这里验证用户名
     var validateUsername = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请输入用户名'))
-        } else if (validateEmail(value)) {
-          callback(new Error('用户名格式错误'))
-        } else {
-          callback() // ture
-        }
+      if (value === '') {
+        callback(new Error('请输入用户名'))
+      } else if (validateEmail(value)) {
+        callback(new Error('用户名格式错误'))
+      } else {
+        callback() // ture
       }
+    }
     // 验证密码
     var validatePassword = (rule, value, callback) => {
       // 过滤数据中包含得特殊字符
@@ -80,9 +80,9 @@ export default {
         callback(new Error('请再次输入密码'))
       } else if (validatepw(value)) {
         callback(new Error('请输入六位数字+字母'))
-      }else if(value !== ruleForm.password) {
+      } else if (value !== ruleForm.password) {
         callback(new Error('输入的密码不相同'))
-      }else {
+      } else {
         callback()
       }
     }
@@ -98,31 +98,31 @@ export default {
       }
     }
     // 登录 注册
-    const menuTab = reactive ([
-        { text: '登录', isactive: true, type: 'login' },
-        { text: '注册', isactive: false, type: 'register' }
-      ])
+    const menuTab = reactive([
+      { text: '登录', isactive: true, type: 'login' },
+      { text: '注册', isactive: false, type: 'register' }
+    ])
     // 注册显示
     const modle = ref('login')
     // 表单绑定数据
-    const ruleForm = reactive( {
+    const ruleForm = reactive({
       username: '',
       password: '',
       passwords: '',
       code: ''
     })
     // 表单得验证
-    const rules = reactive( {
+    const rules = reactive({
       username: [
         { validator: validateUsername, trigger: 'blur' }
       ],
-        password: [
+      password: [
         { validator: validatePassword, trigger: 'blur' }
       ],
-        passwords: [
+      passwords: [
         { validator: validatePasswords, trigger: 'blur' }
       ],
-        code: [
+      code: [
         { validator: validatecode, trigger: 'blur' }
       ]
     })
@@ -131,7 +131,7 @@ export default {
      * 声明函数
      */
     // 页面视图动态渲染
-    const toggleMenu = (data => {
+    const toggleMenu = data => {
       menuTab.forEach(elem => {
         elem.isactive = false
       })
@@ -139,17 +139,15 @@ export default {
       data.isactive = true
       // 切换登录注册
       modle.value = data.type
-    })
+    }
+    /**
+     * 获取验证码
+     */
+    const getcode = code => {
+      getSms()
+    }
     // 提交
-    const submitForm = (formName => {
-      // 为给定 ID 的 user 创建请求
-      axios.get('/user?ID=12345')
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-        })
+    const submitForm = formName => {
       context.refs[formName].validate((valid) => {
         if (valid) {
           alert('submit!')
@@ -158,14 +156,14 @@ export default {
           return false
         }
       })
-    })
+    }
 
     /**
      * 声明生命周期
      */
     // 挂载完成后自动执行
     onMounted(() => {
-      // console.log('mounted!')
+      console.log(process.env.VUE_APP_LIN)
     })
 
     /**
@@ -178,6 +176,7 @@ export default {
       rules,
       toggleMenu,
       submitForm,
+      getcode
     }
   }
 }
