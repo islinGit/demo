@@ -40,9 +40,18 @@ module.exports = {
     disableHostCheck: false,
     host: '0.0.0.0',
     port: 8089,
-    https: false,
-    hotOnly: false, // See https://github.com/vuejs/vue-cli/blob/dev/docs/cli-service.md#configuring-proxy
-    proxy: null // string | Object
+    hot: true, // 设置热加载
+    https: false, // 编辑失败时刷新界面
+    hotOnly: false,
+    proxy: {
+      '/Api': {
+        target: 'http://192.168.43.148:8890', // API服务器地址
+        changeOrigin: true,
+        pathRewrite: {
+          '^/Api': ''
+        }
+      }
+    }
     // before: app => {}
   }, // 第三方插件配置
   pluginOptions: {

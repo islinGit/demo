@@ -38,7 +38,7 @@
 </template>
 <script>
 import { reactive, ref, isRef, onMounted } from '@vue/composition-api'
-import { getSms } from '../api/login'
+import { getSms, getUser } from '../api/login'
 import { stripscript, validateEmail, validatepw, validatcd } from '../utils/validate'
 export default {
   // 数据驱动视图渲染
@@ -144,7 +144,8 @@ export default {
      * 获取验证码
      */
     const getcode = code => {
-      getSms()
+      // getSms({ username: ruleForm.username })
+      getUser()
     }
     // 提交
     const submitForm = formName => {
@@ -163,7 +164,6 @@ export default {
      */
     // 挂载完成后自动执行
     onMounted(() => {
-      console.log(process.env.VUE_APP_LIN)
     })
 
     /**

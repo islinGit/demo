@@ -2,7 +2,11 @@ import axios from 'axios'
 /**
  * 拦截器
  */
-const serve = axios.create()
+const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/Api'
+const serve = axios.create({
+  baseURL: BASEURL + '/api',
+  timeout: 1000
+})
 
 // 添加请求拦截器
 serve.interceptors.request.use(function (config) {

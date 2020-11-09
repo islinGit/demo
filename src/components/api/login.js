@@ -2,16 +2,22 @@ import serve from '../utils/request'
 /**
  * 获取验证码
  */
-console.log(process.env.NODE_ENV)
-export function getSms () {
+
+export function getSms (data) {
   serve.request(
     {
       method: 'post',
-      url: '/getSms',
-      data: {
-      }
+      url: '/getsms',
+      data: data
     }
   )
+}
+export function getUser () {
+  serve.request({
+    method: 'get',
+    url: '/getUser',
+    data: {}
+  })
 }
 
 /**
