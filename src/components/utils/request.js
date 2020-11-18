@@ -4,8 +4,8 @@ import axios from 'axios'
  */
 const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/Api'
 const serve = axios.create({
-  baseURL: BASEURL + '/api',
-  timeout: 1000
+  baseURL: BASEURL,
+  timeout: 2000
 })
 
 // 添加请求拦截器

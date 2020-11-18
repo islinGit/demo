@@ -7,7 +7,7 @@ export function getSms (data) {
   serve.request(
     {
       method: 'post',
-      url: '/getsms',
+      url: '/sentMsg',
       data: data
     }
   )

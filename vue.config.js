@@ -45,7 +45,7 @@ module.exports = {
     hotOnly: false,
     proxy: {
       '/Api': {
-        target: 'http://192.168.43.148:8890', // API服务器地址
+        target: 'localhost:8890', // API服务器地址
         changeOrigin: true,
         pathRewrite: {
           '^/Api': ''

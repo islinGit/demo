@@ -50,6 +50,7 @@ export default {
      */
     // 这里验证用户名
     var validateUsername = (rule, value, callback) => {
+      console.log(rule)
       if (value === '') {
         callback(new Error('请输入用户名'))
       } else if (validateEmail(value)) {
@@ -144,8 +145,8 @@ export default {
      * 获取验证码
      */
     const getcode = code => {
-      // getSms({ username: ruleForm.username })
-      getUser()
+      getSms({ username: ruleForm.username })
+      // getUser()
     }
     // 提交
     const submitForm = formName => {
