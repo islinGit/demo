@@ -30,7 +30,7 @@
             </el-row>
           </el-form-item>
           <el-form-item>
-            <el-button @click="submitForm('ruleForm')" class="login-tj block" type="danger">提交</el-button>
+            <el-button @click="submitForm('ruleForm')" class="login-tj block" type="danger">{{submitButton}}</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -98,11 +98,13 @@ export default {
         callback()
       }
     }
+    // *******************************************************************   数据          **************************************
     // 登录 注册
     const menuTab = reactive([
-      { text: '登录', isactive: true, type: 'login' },
-      { text: '注册', isactive: false, type: 'register' }
+      { text: '登录', isactive: true, type: 'login', sb: '提交' },
+      { text: '注册', isactive: false, type: 'register', sb: '注册' }
     ])
+    const submitButton = ref('提交')
     // 注册显示
     const modle = ref('login')
     // 表单绑定数据
@@ -140,6 +142,7 @@ export default {
       data.isactive = true
       // 切换登录注册
       modle.value = data.type
+      submitButton.value = data.sb
     }
     /**
      * 获取验证码
@@ -177,7 +180,8 @@ export default {
       rules,
       toggleMenu,
       submitForm,
-      getcode
+      getcode,
+      submitButton
     }
   }
 }
