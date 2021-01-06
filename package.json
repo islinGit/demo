@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@vue/composition-api": "^1.0.0-beta.11",
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
     "core-js": "^3.6.4",
     "element-ui": "^2.13.2",
